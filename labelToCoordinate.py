@@ -10,7 +10,7 @@ surfSubjName = ["ab","bg","ec","kj","lh","ls","mm","pk","ta","ts","xy","zb"]
 # In[5]:
 
 #mri_annotation2label: to convert an annotation file into multiple label files or into a segmentation 'volume'.
-#convert the lh/rh.aparc.annot to alot of label, each label is a brain area: Frontal lobe, parietal lobe, occipital lobe etc.
+#convert the lh/rh.aparc.annot to a lot of label, each label is a brain area: Frontal lobe, parietal lobe, occipital lobe etc.
 
 import subprocess
 
@@ -165,7 +165,7 @@ for s in range(0,len(fsSubjName)):
 
 # In[13]:
 
-#open matlab ,dse the Euclidean distance to draw a line(40 vertices) between this two vertex, so that I get 40 vertices,
+#open matlab ,use the Euclidean distance to draw a line(40 vertices) between this two vertex, so that I get 40 vertices,
 #use the freesurfer 2-dimention flat data(eg,lh.full.flat.patch.3d) to compute the Euclidean distance,
 #then I got five vertices which are nearest to each vertex separately,
 
