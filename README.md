@@ -19,6 +19,8 @@ This project mean to automatically draw a line between two anatomic areas.
   compute 20 equal distance points between these two nodes,in 2 dimension surface---lh/rh full.flat.patch.3d 
   then find the nearest five nodes to each nodes and write to.1D file.
   
-6,localizeData.py
-  use the above .1D file(20 .1D file, each file contains five nodes )
+6,drawROI.py: convert all the .1D file to .dset file, so that can read in SUMA.
+  
+7,localizeData.py
+  use the above .1D file(20 .1D file, each file contains five nodes) to extract blur epi data.
 
