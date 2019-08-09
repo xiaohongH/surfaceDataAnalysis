@@ -1,5 +1,7 @@
 function [ XindexTovnoList ] = writeDivideNodes( nodes1,nodes2,hemi,subName)
-%compute 20 equal distance points between these two nodes,in 2 dimension surface---lh/rh full.flat.patch.3d
+%compute 20 equal distance points between these two nodes,in 2 dimension surface---lh/rh full.flat.patch.3d;
+% then find the nearest five nodes to each nodes and write to.1D file.
+
 %nodes1 -- the vertex in FFA or PPA;
 %nodes2 -- the vertex in FFA or PPA;
 %hemi -- lh/rh
