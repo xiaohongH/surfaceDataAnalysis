@@ -1,0 +1,9 @@
+recon-all -all -i ~/all_subj/surfaceProj/surfaceRawData/ab/anat.nii -subjid ab -sd ~/freesurfer 
+
+the results of the above command:
+
+mri：
+surf：inflated pial smoothwm... - based on raw anatomic space
+label: annot label..
+fsaverage: standard space
+...
