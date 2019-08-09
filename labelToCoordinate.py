@@ -3,50 +3,32 @@
 
 # In[11]:
 
-
 hemi = ["rh","lh"]
-
 fsSubjName = ["ab_data","bg_data","ec","kj","lh","ls","mm","pk","ta","ts","xy","zb"]
 surfSubjName = ["ab","bg","ec","kj","lh","ls","mm","pk","ta","ts","xy","zb"]
 
-# fsSubjName = ["ab_data"]
-# surfSubjName = ["ab"]
-
-
 # In[5]:
 
+#mri_annotation2label: to convert an annotation file into multiple label files or into a segmentation 'volume'.
+#convert the lh/rh.aparc.annot to alot of label, each label is a brain area: Frontal lobe, parietal lobe, occipital lobe etc.
 
-#recon-all之后的结构像，再将全脑分成不同的脑区
-#将lh.aparc.annot分割成一个一个的label，每一个label中的值是都是一个一个的vertex
-#jupyter 要在bash下打开才能执行
 import subprocess
-
-# fsSubjName = ["lh"]
-# surfSubjName = ["lh"]
 
 for s in range(0,len(fsSubjName)):
     inFileName = "/mnt/data_disk/projects/all_subj/surfaceProj/surfaceFreesurferAnat/bingFreesurfer"
     outFileName = "/mnt/data_disk/projects/all_subj/surfaceProj/surfaceFreesurferAnat/bingFreesurfer/"+fsSubjName[s]+"/SUMA/"
 
-
     for h in hemi:
         command1 = "mkdir "+outFileName+h+"\\"
         print command1
         subprocess.call(command1,shell = True)
-
-        command = "bash;        mri_annotation2label --subject "+fsSubjName[s]+" --hemi "+h+"         --annotation  aparc.a2009s         --outdir "+outFileName+h
-
-        print command
+        
+        command = "bash;mri_annotation2label --subject "+fsSubjName[s]+" --hemi "+h+" --annotation  aparc.a2009s --outdir "+outFileName+h
         subprocess.call(command,shell = True)
-        #将1D文件转成dset文件
-    #     ConvertDset -o_1D -add_node_index -input lh+fusiform+parahippocampal.1D -prefix lh+fusiform+parahippocampal
-
 
 # In[7]:
+#combine several labels(.G_oc-temp_med-Parahip.label,.G_oc-temp_lat-fusifor.label,S_oc-temp_med&Lingual.label...) into a single mask;
 
-
-#合并多个label的值;用作mask，求出这个mask内的看face和house的最大最小值
-#并将多个label中vertex的值提取出来
 import os
 import numpy as np
 import subprocess
@@ -89,9 +71,8 @@ for s in range(0,len(fsSubjName)):
 
 
 # In[8]:
+#convert the above .label file to .dset file, so that python can read the file and get all the nodes of this big mask.
 
-
-#将合并的label，从1D转成.dset文件
 hemi = ["lh","rh"]
 
 addLabelName = "+Parahip+Lingual+fusifor"
@@ -111,26 +92,25 @@ for s in range(0,len(fsSubjName)):
 
 # In[9]:
 
+#the t-test statistic results of EIP localizer data preprocessing,(eg:ab subject and lh hemisphere): stats.ab.surf.lh.niml.dset
+#convert the t-test statistic results(eg,stats.ab.surf.lh.niml.dset) to .1D.dset,
+#so that python can read nodes and the corespond t value. 
 
-#将localizer stast.niml.dset的数据转成1D.dset的数据
 import os
 import subprocess
 hemi = ["lh","rh"]
 for s in range(0,len(fsSubjName)):
     filePath = "/mnt/data_disk/projects/all_subj/surfaceProj/afni/localizerExp/surfAnalysis/"+surfSubjName[s]+"/"+surfSubjName[s]+".surf.results/"
     for h in hemi:
-        command = "cd "+filePath+";        ConvertDset -o_1D -input "+filePath+"/stats."+surfSubjName[s]+".surf."+h+".niml.dset"+" -prefix stats."+surfSubjName[s]+"."+h
+        command = "cd "+filePath+"; ConvertDset -o_1D -input "+filePath+"/stats."+surfSubjName[s]+".surf."+h+".niml.dset"+" -prefix stats."+surfSubjName[s]+"."+h
         print command
         subprocess.call(command, shell=True)
-
-
+        
 # In[12]:
-
-
-#求出tempole中，stats对看face和house激活最大最小的vertex的值
-#extract label中的数据，并求出stat中，在templobe 这个roi内的，最大最小值对应的nodes的值
-#求出 FFA和PPA的坐标
-#vertex num从0开始
+#compute the maximum and minimum t value of the statistic dataset in the above mask.
+#extrat the correspond vertex,
+#so that can use this two vertex to draw a line.
+#vertex num starts from 0
 import pandas as pd
 import numpy as np
 def readStatsData(infileDir):
@@ -177,10 +157,6 @@ def getMaxMinNodes(hemi,fsSubjName,surfSubjName):
     return maxIndex,minIndex
 
 
-
-hemi = ["lh","rh"]
-# fsSubjName = ["ls"]
-# surfSubjName = ["ls"]
 for s in range(0,len(fsSubjName)):
     for h in range(len(hemi)):
         maxIndex,minIndex = getMaxMinNodes(hemi[h],fsSubjName[s],surfSubjName[s])
@@ -189,28 +165,16 @@ for s in range(0,len(fsSubjName)):
 
 # In[13]:
 
+#open matlab ,dse the Euclidean distance to draw a line(40 vertices) between this two vertex, so that I get 40 vertices,
+#use the freesurfer 2-dimention flat data(eg,lh.full.flat.patch.3d) to compute the Euclidean distance,
+#then I got five vertices which are nearest to each vertex separately,
 
-#打开matlab，将两点之间的nodes，分割成好几部分，并连线
 import matlab.engine
 eng = matlab.engine.start_matlab()
 
 for s in range(0,len(fsSubjName)):
     for h in range(len(hemi)):
         maxIndex,minIndex = getMaxMinNodes(hemi[h],fsSubjName[s],surfSubjName[s])
-        print maxIndex,minIndex
+#         print maxIndex,minIndex
         ret = eng.writeDivideNodes(int(maxIndex.index.values),int(minIndex.index.values),hemi[h],fsSubjName[s])
-        print(ret)
-#         writeDivideNodes(42959,41677,'rh','ab_data',[10])
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
+#         print(ret)
